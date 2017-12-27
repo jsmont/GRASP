@@ -17,6 +17,7 @@ class Solution {
     vector<bool> nurse_works;
     int assignments;
     int total_assignments;
+    int score;
 
 public:
 

@@ -5,6 +5,7 @@ Solution::Solution(SolutionParams parameters){
     this->works = vector<vector<bool>>(parameters.numHours,vector<bool>(parameters.numNurses,false));
     this->nurse_works = vector<bool>(parameters.numNurses, false);
     this->assignments = 0;
+    this->score=parameters.numNurses;
 }
 
 bool Solution::isComplete(){
@@ -19,6 +20,7 @@ void Solution::addAssignment(vector<bool> new_assignment){
 
 void Solution::popLastAssignment(){
     assignments--;
+    updateNurseWorks(); //Otherwise getScore() is incorrect
 }
 
 vector<vector<bool>> Solution::getAssignments(){
@@ -30,11 +32,12 @@ void Solution::resetAssignments(){
 }
 
 int Solution::getScore(){
-    int workingNurses = 0;
+    /*int workingNurses = 0;
     for(int n = 0; n < nurse_works.size(); ++n){
         workingNurses+=nurse_works[n];
     }
-    return workingNurses;
+    return workingNurses;*/ 
+    return score;
 }
 
 int Solution::getGreedy(){
@@ -42,13 +45,13 @@ int Solution::getGreedy(){
 }
 
 void Solution::updateNurseWorks(){
-
+    int worlkingNurses=0;
     for(int n = 0; n < nurse_works.size(); ++n){
         bool nworks = false;
         for(int h = 0; h < assignments && !nworks; ++h){
             nworks |= works[h][n];
         }
         nurse_works[n] = nworks;
+	workingNurses+=nurse_works[n];
     }
-
 }
