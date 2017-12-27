@@ -12,7 +12,7 @@ void Grasp::executeGrasp(int maxiter, float alpha){
 		Solution sol;
 		construct(sol,alpha);
 		local();
-		if (sol.getScore() < bestSo.getScore()) bestSol=sol; //Can keep value for bestSol
+		if (sol.getScore() < bestSol.getScore()) bestSol=sol; //Can keep value for bestSol
 		//Could also add a Score field for Solution class to avoid to compute it again
 	}
 }
