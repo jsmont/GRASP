@@ -5,10 +5,12 @@ class Grasp {
 	typedef std::vector<bool> Candidate;
 	
 	public:
-		Grasp();
-		void executeGrasp(int maxiter, float alpha);
+		Grasp(int maxiter, float alpha);
+		void executeGrasp();
 
 	private:
+		int maxiter;
+		float alpha;
 		
 		void construct(Solution sol, float alpha);
 		void initCandidates(std::list<Candidate> &C);

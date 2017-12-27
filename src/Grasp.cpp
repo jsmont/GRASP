@@ -1,10 +1,11 @@
 #include "Grasp.h"
 
-Grasp::Grasp(){
-
+Grasp::Grasp(int maxiter, float alpha){
+	this.maxiter=maxiter;
+	this.alpha=alpha;
 }
 
-void Grasp::executeGrasp(int maxiter, float alpha){
+void Grasp::executeGrasp(){
 
 	Solution bestSol;
 
