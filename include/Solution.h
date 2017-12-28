@@ -8,6 +8,7 @@ using namespace std;
 typedef struct {
     int numHours;
     int numNurses;
+    vector<int> demand;
 } SolutionParams;
 
 
@@ -15,6 +16,8 @@ class Solution {
   
     vector<vector<bool>> works;
     vector<bool> nurse_works;
+    vector<int> demand;
+    vector<int> nurses_working;
     int assignments;
     int total_assignments;
     int score;
@@ -33,6 +36,7 @@ public:
 private:
     
     void updateNurseWorks();
+    void updateNursesWorking(int h)
 };
 
 #endif

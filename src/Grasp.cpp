@@ -5,7 +5,7 @@ Grasp::Grasp(int maxiter, float alpha){
 	this.alpha=alpha;
 }
 
-void Grasp::executeGrasp(){
+void Grasp::executeGrasp(){ //Change to return Solution?
 
 	Solution bestSol;
 
