@@ -9,6 +9,9 @@ typedef struct {
     int numHours;
     int numNurses;
     vector<int> demand;
+    int maxHours;
+    int maxConsec;
+    int maxPresence;
 } SolutionParams;
 
 
@@ -21,6 +24,10 @@ class Solution {
     int assignments;
     int total_assignments;
     int score;
+    int numNurses;
+    int maxHours;
+    int maxConsec;
+    int maxPresence;
 
 public:
 
@@ -32,6 +39,9 @@ public:
     void resetAssignments();
     int getScore();
     int getGreedy();
+    int getDemand();
+    int getNumNurses();
+    bool validSolution();
 
 private:
     

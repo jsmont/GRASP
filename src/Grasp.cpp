@@ -20,19 +20,30 @@ void Grasp::executeGrasp(){ //Change to return Solution?
 
 void Grasp::construct(Solution sol, float alpha){
 	std::list<Candidate> C;	
-	initCandidates(C);
+	initCandidates(C,sol);
 	while(!sol.isComplete()){			
 		sol.addAssignment(RCL(alpha,sol, C));
-		updateCandidates(C);
+		updateCandidates(C,sol);
 	}
 }
 
 
-void initCandidates(std::list<Candidate> &C){
-
+void initCandidates(std::list<Candidate> &C, Solution sol){ //Since we are doing incrementally by hours, first hour is trivial. Could add in other order
+	C.clear(); //just in case
+	int demand = sol.getDemand(); //probably not necessary to get them from solution
+	int numNurses = sol.getNumNurses();
+	Candidate c(numNurses, false);
+	for(int i=0; i<demand;i++) c[i]=true;
+	C.push_back(c);
 }
 
-void updateCandidates(std::list<Candidate> &C){
+void updateCandidates(std::list<Candidate> &C, Solution sol){
+	
+
+}	
+int demand = sol.getDemand(); //probably not necessary to get them from solution
+        int numNurses = sol.getNumNurses();
+        Candidate c(numNurses, false);
 
 }
 
