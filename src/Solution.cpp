@@ -122,11 +122,13 @@ bool Solution::validSolution(){
 	//(4) Each nurse must work at most maxConsec hours 
 	//(5) Each nurse must stay at most maxPresence
 	//(6) A nurse must rest at most one consecutive hour
-
-	for(int n=0; n<numNurses; n++){
-		validSolution(n);	
+	bool ok=true;
+	int n=0;
+	while(n<numNurses && ok){
+		ok&=validSolution(n);	
+		n++;
 	}
-	return true;
+	return ok;
 }
 bool Solution::validSolution(int n){
 	if(nurse_works[n]){
