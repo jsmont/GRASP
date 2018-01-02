@@ -17,7 +17,7 @@ typedef struct {
 
 class Solution {
   
-    vector<vector<bool>> works;
+    vector<vector<bool> > works;
     vector<bool> nurse_works;
     vector<int> demand;
     vector<int> nurses_working;
@@ -35,23 +35,24 @@ public:
     bool isComplete();
     void addAssignment(vector<bool> new_assignment);
     void popLastAssignment();
-    void addAssignment(vector<bool new_assignment, int h)
-    vector<vector<bool>> getAssignments();
+    void addAssignment(vector<bool> new_assignment, int h);
+    vector<vector<bool> > getAssignments();
     void resetAssignments();
     int getScore();
     int getGreedy();
-    int getDemand();
+    int getDemand(int h);
     int getNumNurses();
     int getNumHours();
-    vector<bool> getNurseWorks()
+    int getAssignedHours();
+    vector<bool> getNurseWorks();
     bool validSolution();
     bool validSolution(int n);
-    bool validCandidate(int n, int h)
+    bool validCandidate(int n, int h);
 
 private:
     
     void updateNurseWorks();
-    void updateNursesWorking(int h)
+    void updateNursesWorking(int h);
 };
 
 #endif
