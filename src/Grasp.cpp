@@ -40,21 +40,25 @@ void Grasp::updateCandidates(std::list<Candidate> &C, Solution sol){
 	int demand = sol.getDemand();
         int numNurses = sol.getNumNurses();
         Candidate c(numNurses, false);
-	generateCandidates(C, c, demand, 0);
+	generateCandidates(C, c, demand, 0, sol.getAssignments()+1);
 }
 
-void Grasp::generateCandidates(std::list<Candidate> &C, Candidate c, int remaining, int pos){	
+void Grasp::generateCandidates(std::list<Candidate> &C, Candidate c, int remaining, int pos, int h){	
 	if(remaining==0) C.push_back(c);
 	else {
 		if(C.size()-pos == remaining){	//Can only set trues
-			c[pos]=true;
-			generateCandidate(C, c, remaining-1, pos+1);
+			if(sol.validCandidate(pos, h)) {
+				c[pos]=true;
+				generateCandidate(C, c, remaining-1, pos+1, h);
+			}
 		}	
 		else {
-			c[pos]=true;
-			generateCandidate(C, c, remaining-1, pos+1);
+			if(sol.validCandidate(pos, h)) {
+				c[pos]=true;
+				generateCandidate(C, c, remaining-1, pos+1,h);
+			}
 			c[pos]=false;
-			generateCandidate(C, c, remaining, pos+1);
+			generateCandidate(C, c, remaining, pos+1,h);
 		}
 	}		
 }
@@ -68,7 +72,7 @@ Candidate Grasp::RCL(float alpha, Solution sol, std::list<Candidate> &C){
 		sol.addAssignment(*it);
 		greed[i]=sol.getGreedy();
 		if(greed[i] > max_greed) max_greed=greed[i];
-		else if(greed[i] < min_greed) min_greed=greed[i];
+		else if(greed[i] < min_greed) min_greed=greed[i];	
 		sol.popLastAssignement();
 	}
 	int threshold = min_greed + alpha*(max_greed-min_greed);
@@ -103,26 +107,55 @@ void Grasp::local(Solution sol){
 }
 
 void Grasp::findNeighbours(Solution sol, std::list<Solution> neighbours){
-	generateNeighbours(sol, neighbours, 2, 0);
+	generateNeighbours(sol, neighbours, -1, -1, 0);
 }
 
-void Grasp::generateNeighbours(Solution sol, std::list<Solution> neighbours, int remaining, int h){
-        if(remaining!=0) {
-                if(sol.getNumHours()-pos == remaining){  //Can only set trues
-               		generateNeighbours(sol, neighbours, h);
-                        generateNeighbours(sol, neighbours,remaining-1, h+1);
+void Grasp::generateNeighbours(Solution sol, std::list<Solution> neighbours, int h1, int h2, int h){
+        if(h2<0 && h < sol.getNumHours()) {
+		if(h1<0) generateNeighbours(sol, neighbours, h, h2, h+1); //fill h1
+		else generateNeighbours(sol, neighbours, h1, h, h+1);	//fill h2
+		generateNeighbours(sol, neighbours, h1, h2, h+1);	//fill none
+        }
+	else generateNeighbours(sol, neighbours, h1, h2);
+}
+
+void Grasp::generateNeighbours(Solution sol, std::list<Solution> neighbours, int h1, int h2){
+	std:list<Candidate> C1, C2;
+	Candidate c;
+        int demand1 = sol.getDemand(h1);
+	int demand2 = sol.getDemand(h2);
+        int numNurses = sol.getNumNurses();
+	std::vector<bool> nurse_works(numNurses);
+//	nurse_works=sol.getNurseWorks();
+        Candidate c1(numNurses, false);
+	Candidate c2(numNurses, false);
+        generateCandidates(C1, c1, demand1, 0, h1);
+	generateCandidates(C2, c2, demand2, 0 ,h2);
+ 
+	for (std::list<int>::iterator it1=C1.begin(); it1 != C.end(); ++it1){
+ 		for (std::list<int>::iterator i21=C1.begin(); it2 != C.end(); ++it2){ 
+			sol.addAssignment(*it1,h1);
+			sol.addAssignment(*it2,h2);
+			if(sol.validSolution())neighbours.push_back(sol);
+		}
+        }	
+	
+}	
+
+/*void Grasp::generateCandidates(std::list<Candidate> &C, Candidate c, int remaining, int posstd::vector<bool> nurse_works){
+        if(remaining==0) C.push_back(c);
+        else {
+                if(C.size()-pos == remaining && nurse_works[pos]){ 
+                        c[pos]=true;
+                        generateCandidate(C, c, remaining-1, pos+1);
                 }
                 else {
-                        generateNeighbours(sol, neighbours, h);
-                        generateNeighbours(sol, neighbours,remaining-1, h+1);
-			generateNeighbours(sol, neighbours,remaining-1, h+1);
-
+                        if(nurse_works[pos]{
+				c[pos]=true;
+                        	generateCandidate(C, c, remaining-1, pos+1);
+                        }
+			c[pos]=false;
+                        generateCandidate(C, c, remaining, pos+1);
                 }
         }
-}
-
-void Grasp::generateNeighbours(Solution sol, std::list<Solution> neighbours, int h){
-
-
-
-}	
+}*/

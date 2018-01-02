@@ -42,9 +42,11 @@ public:
     int getGreedy();
     int getDemand();
     int getNumNurses();
-    int Solution:getNumHours();
+    int getNumHours();
+    vector<bool> getNurseWorks()
     bool validSolution();
     bool validSolution(int n);
+    bool validCandidate(int n, int h)
 
 private:
     

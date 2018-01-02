@@ -75,6 +75,14 @@ int Solution:getNumHours(){
     return total_assignments;
 }
 
+vector<bool> Solution:getNurseWorks(){
+    return nurse_works;
+}
+
+int Solution::getAssignments(){
+	return assignments;
+}
+
 void Solution::updateNurseWorks(){ //do we really need to check all hours? better just the assigned / unassigned one (only check previous if unassigning and under some conditions) 
     int workingNurses=0;
     for(int n = 0; n < nurse_works.size(); ++n){
@@ -101,8 +109,10 @@ bool Solution::validSolution(){
 	//should also work for partial solutions
 	
 	//(1) At least each hour h there must be at least demand_h nurses working
-	for(int h=0; h<assignments; h++)
-		if (demand[h]>nurses_working[h]) return false;
+	if(isComplete(){
+		for(int h=0; h<assignments; h++)
+			if (demand[h]>nurses_working[h]) return false;
+	}
 	
 	//(2) Each nurse must work at least minHours -> trivially satisfied (otherwise postprocess)
 	//CARE! NOT NECESSARILY!
@@ -145,4 +155,10 @@ bool Solution::validSolution(int n){
 	}	
 	return true;
 }
-
+bool Solution::validCandidate(int n, int h){
+	bool tmp = works[n][h];
+	works[n][h] = true;
+	bool valid = validSolution(n);
+	works[n][h] = tmp;
+	return valid;
+}
