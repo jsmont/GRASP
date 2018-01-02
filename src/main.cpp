@@ -12,7 +12,7 @@ int main(int argc, char* argv[]){
 	int iterations=argv[2];
 	float alpha=argv[3];
 
-	Grasp g(iterations, alpha); //do a better iterating system, changing alpha and stuff
-	g.executeGrasp(); 
+	Grasp g; //do a better iterating system, changing alpha and stuff
+	g.executeGrasp(iterations,alpha); 
 		
 }

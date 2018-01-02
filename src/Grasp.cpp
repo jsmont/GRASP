@@ -1,12 +1,9 @@
 #include "Grasp.h"
 
-Grasp::Grasp(int maxiter, float alpha){
-	this.maxiter=maxiter;
-	this.alpha=alpha;
+Grasp::Grasp(){
 }
 
-void Grasp::executeGrasp(){ //Change to return Solution?
-
+Solution Grasp::executeGrasp(int maxiter, float alpha){ 
 	Solution bestSol;
 
 	for(int k = 0; k < maxiter; k++){
@@ -16,6 +13,7 @@ void Grasp::executeGrasp(){ //Change to return Solution?
 		if (sol.getScore() < bestSol.getScore()) bestSol=sol;
 		//Added a Score field for Solution class to avoid to compute it again
 	}
+	return bestSol;
 }
 
 void Grasp::construct(Solution sol, float alpha){
@@ -28,7 +26,7 @@ void Grasp::construct(Solution sol, float alpha){
 }
 
 
-void initCandidates(std::list<Candidate> &C, Solution sol){ //Since we are doing incrementally by hours, first hour is trivial. Could add in other order
+void Grasp::initCandidates(std::list<Candidate> &C, Solution sol){ //Since we are doing incrementally by hours, first hour is trivial. Could add in other order
 	C.clear(); //just in case
 	int demand = sol.getDemand(); //probably not necessary to get them from solution
 	int numNurses = sol.getNumNurses();
@@ -37,14 +35,28 @@ void initCandidates(std::list<Candidate> &C, Solution sol){ //Since we are doing
 	C.push_back(c);
 }
 
-void updateCandidates(std::list<Candidate> &C, Solution sol){
-	
-
-}	
-int demand = sol.getDemand(); //probably not necessary to get them from solution
+void Grasp::updateCandidates(std::list<Candidate> &C, Solution sol){	
+	C.clear();
+	int demand = sol.getDemand();
         int numNurses = sol.getNumNurses();
         Candidate c(numNurses, false);
+	generateCandidates(C, c, demand, 0);
+}
 
+void Grasp::generateCandidates(std::list<Candidate> &C, Candidate c, int remaining, int pos){	
+	if(remaining==0) C.push_back(c);
+	else {
+		if(C.size()-pos == remaining){	//Can only set trues
+			c[pos]=true;
+			generateCandidate(C, c, remaining-1, pos+1);
+		}	
+		else {
+			c[pos]=true;
+			generateCandidate(C, c, remaining-1, pos+1);
+			c[pos]=false;
+			generateCandidate(C, c, remaining, pos+1);
+		}
+	}		
 }
 
 Candidate Grasp::RCL(float alpha, Solution sol, std::list<Candidate> &C){
@@ -91,5 +103,26 @@ void Grasp::local(Solution sol){
 }
 
 void Grasp::findNeighbours(Solution sol, std::list<Solution> neighbours){
-
+	generateNeighbours(sol, neighbours, 2, 0);
 }
+
+void Grasp::generateNeighbours(Solution sol, std::list<Solution> neighbours, int remaining, int h){
+        if(remaining!=0) {
+                if(sol.getNumHours()-pos == remaining){  //Can only set trues
+               		generateNeighbours(sol, neighbours, h);
+                        generateNeighbours(sol, neighbours,remaining-1, h+1);
+                }
+                else {
+                        generateNeighbours(sol, neighbours, h);
+                        generateNeighbours(sol, neighbours,remaining-1, h+1);
+			generateNeighbours(sol, neighbours,remaining-1, h+1);
+
+                }
+        }
+}
+
+void Grasp::generateNeighbours(Solution sol, std::list<Solution> neighbours, int h){
+
+
+
+}	
