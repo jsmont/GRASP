@@ -14,6 +14,12 @@ typedef struct {
     int maxPresence;
 } SolutionParams;
 
+typedef struct {
+	int nurse;
+        int hour;
+	int greed;
+} Candidate;
+
 
 class Solution {
   
@@ -21,8 +27,8 @@ class Solution {
     vector<bool> nurse_works;
     vector<int> demand;
     vector<int> nurses_working;
-    int assignments;
-    int total_assignments;
+    //int assignments;
+    int numHours;
     int score;
     int numNurses;
     int maxHours;
@@ -33,26 +39,26 @@ public:
 
     Solution(SolutionParams parameters);
     bool isComplete();
-    void addAssignment(vector<bool> new_assignment);
-    void popLastAssignment();
-    void addAssignment(vector<bool> new_assignment, int h);
+    //void addAssignment(vector<bool> new_assignment);
+    //void popLastAssignment();
+    void addAssignment(Candidate c);
     vector<vector<bool> > getAssignments();
-    void resetAssignments();
+    void reset();
     int getScore();
-    int getGreedy();
+    int getGreedy(int n, int h);
     int getDemand(int h);
     int getNumNurses();
     int getNumHours();
-    int getAssignedHours();
+    //int getAssignedHours();
     vector<bool> getNurseWorks();
     bool validSolution();
     bool validSolution(int n);
-    bool validCandidate(int n, int h);
+    int validCandidate(int n, int h);
 
 private:
     
-    void updateNurseWorks();
-    void updateNursesWorking(int h);
+    //void updateNurseWorks();
+    //void updateNursesWorking(int h);
 };
 
 #endif

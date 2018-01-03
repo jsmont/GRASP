@@ -1,13 +1,12 @@
 #include "Solution.h"
 
 Solution::Solution(SolutionParams parameters){
-    this->total_assignments=parameters.numHours;
+    this->numHours=parameters.numHours;
     this->works = vector<vector<bool> >(parameters.numNurses,vector<bool>(parameters.numHours,false));
     this->nurse_works = vector<bool>(parameters.numNurses, false);
     this->demand = vector<int>(parameters.numHours);
     demand = parameters.demand; //Can do it in a single expression?
     this->nurses_working = vector<int>(parameters.numHours, 0);
-    this->assignments = 0;
     this->score = 0;
     this->numNurses = parameters.numNurses;
     this->maxHours = parameters.maxHours;
@@ -16,48 +15,54 @@ Solution::Solution(SolutionParams parameters){
 }
 
 bool Solution::isComplete(){
-    return assignments == total_assignments;
+	for(int h=0; h<numHours; h++){
+		if(nurses_working[h]<demand[h]) return false; //Sure?
+	}
+	return true;
 }
 
-void Solution::addAssignment(vector<bool> new_assignment){
-    works[assignments] = new_assignment;
-    updateNursesWorking(assignments);
-    assignments++;
-    updateNurseWorks();
+void Solution::addAssignment(Candidate c){
+    works[c.nurse][c.hour] = true;
+    nurses_working[c.hour]++;
+    if(!nurse_works[c.nurse]) score++;
+    nurse_works[c.nurse]=true;
 }
 
-void Solution::popLastAssignment(){
+/*void Solution::popLastAssignment(){
     assignments--;
     nurses_working[assignments]=0;
     updateNurseWorks(); //Otherwise getScore() is incorrect
-}
+}*/
 
-void Solution::addAssignment(vector<bool> new_assignment, int h){ //Overwrites assignment h, use only in local search
+/*void Solution::addAssignment(vector<bool> new_assignment, int h){ //Overwrites assignment h, use only in local search
     works[h] = new_assignment;
     updateNursesWorking(assignments);
     updateNurseWorks();
-}
+}*/
 
 vector<vector<bool> > Solution::getAssignments(){
     return works;
 }
 
-void Solution::resetAssignments(){
-    assignments = 0;
+void Solution::reset(){
+	for(int n=0; n<numNurses; n++){
+		for(int h=0;h<numHours;h++){
+			works[n][h]=false;
+			score=0;
+		}
+	}
 }
 
 int Solution::getScore(){
-    return score;
+    	/*score=0;
+	for(int n=0;n<numNurses;n++){
+		score += nurse_works[n];			
+	}*/
+	return score;
 }
 
-int Solution::getGreedy(){ //obviously will have to tune and stuff
-   /* int diff;
-
-    for (int h=0; h<assignments; h++){
-	if(nurses_working[h]<demand[h]) diff += 50*(demand[h]-nurses_working[h]);
-	else diff += 5*(nurses_working[h] - demand[h]);
-    }*/
-    return nurses_working[assignments]-score; //if score increased -> 0; otherwise will be negative
+int Solution::getGreedy(int n, int h){ //obviously will have to tune and stuff
+	return score=10*(nurses_working[h]+1>demand[h])+(score+!nurse_works[n]);
 }
 
 int Solution::getDemand(int h){
@@ -69,18 +74,18 @@ int Solution::getNumNurses(){
 } 
 
 int Solution::getNumHours(){
-    return total_assignments;
+    return numHours;
 }
 
 vector<bool> Solution::getNurseWorks(){
     return nurse_works;
 }
 
-int Solution::getAssignedHours(){
+/*int Solution::getAssignedHours(){
 	return assignments;
-}
+}*/
 
-void Solution::updateNurseWorks(){ //do we really need to check all hours? better just the assigned / unassigned one (only check previous if unassigning and under some conditions) 
+/*void Solution::updateNurseWorks(){ //do we really need to check all hours? better just the assigned / unassigned one (only check previous if unassigning and under some conditions) 
     int workingNurses=0;
     for(int n = 0; n < nurse_works.size(); ++n){
         bool nworks = false;
@@ -98,7 +103,7 @@ void Solution::updateNursesWorking(int h){
 	for (int n = 0; n < nurse_works.size(); ++n){
 		nurses_working[h] += works[h][n];
 	}
-}
+}*/
 
 bool Solution::validSolution(){
 
@@ -107,7 +112,7 @@ bool Solution::validSolution(){
 	int n=0;
 	//(1) At least each hour h there must be at least demand_h nurses working
 	if(isComplete()){
-		for(int h=0; h<assignments; h++)
+		for(int h=0; h<numHours; h++)
 			if (demand[h]>nurses_working[h]) return false;
 	}
 	
@@ -130,10 +135,10 @@ bool Solution::validSolution(int n){
 		int worked_hours=0;
 		int h=0;
 		int consec=0;
-		int first=-assignments;	
+		int first=-numHours;	
 		bool presence=false;
 		int rest=0;
-		while(h<assignments && worked_hours<=maxHours && consec<=maxConsec && !presence){
+		while(h<numHours && worked_hours<=maxHours && consec<=maxConsec && !presence){
 			if(works[n][h]){
 				if(first<0) first=h;
 				else presence=(h-first>=maxPresence);
@@ -152,10 +157,12 @@ bool Solution::validSolution(int n){
 	}	
 	return true;
 }
-bool Solution::validCandidate(int n, int h){
-	bool tmp = works[n][h];
+int Solution::validCandidate(int n, int h){
+	if(works[n][h]) return -1;
+	if(demand[h]<=nurses_working[h]) return -1;
 	works[n][h] = true;
 	bool valid = validSolution(n);
-	works[n][h] = tmp;
-	return valid;
+	works[n][h] = false;
+	if(valid) return getGreedy(n,h);
+	return -1;
 }

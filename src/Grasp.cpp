@@ -15,7 +15,7 @@ Solution Grasp::executeGrasp(int maxiter, float alpha){
 		cout << "Construction Phase" << endl;
 		construct(sol,alpha);
 		cout << "Local Search" << endl;
-		local(sol);
+		//local(sol);
 		cout << "Score: " << sol.getScore() << endl;
 		if (sol.getScore() < bestSol.getScore()) bestSol=sol;		
 		cout << "Current best score: " << bestSol.getScore() << endl;
@@ -26,35 +26,44 @@ Solution Grasp::executeGrasp(int maxiter, float alpha){
 void Grasp::construct(Solution sol, float alpha){
 	std::list<Candidate> C;	
 	initCandidates(C,sol);
-	while(!sol.isComplete()){
-		sol.addAssignment(RCL(alpha,sol, C));
+	int n=0;
+	while(!C.empty()){
+		Candidate c;
+		c=RCL(alpha,sol, C);
+		sol.addAssignment(c);
 		updateCandidates(C,sol);
+		n++;
 	}
 }
 
 
-void Grasp::initCandidates(std::list<Candidate> &C, Solution sol){ //Since we are doing incrementally by hours, first hour is trivial. Could add in other order
-
-	C.clear(); //just in case
-	int demand = sol.getDemand(0); //probably not necessary to get them from solution
+void Grasp::initCandidates(std::list<Candidate> &C, Solution sol){ 
 	int numNurses = sol.getNumNurses();
-	Candidate c(numNurses, false);
-	for(int i=0; i<demand;i++) c[i]=true;
-	C.push_back(c);
+	int numHours = sol.getNumHours();
+	for(int n=0; n<numNurses; ++n){
+		for(int h=0; h<numHours; ++h){
+			int g = sol.validCandidate(n, h);
+			if(g>0){
+				Candidate c;
+				c.nurse=n;
+				c.hour=h;
+				c.greed=g;
+				C.push_back(c);
+			}
+		}
+	}
 }
 
 void Grasp::updateCandidates(std::list<Candidate> &C, Solution sol){	
-	C.clear();
-	int demand = sol.getDemand(sol.getAssignedHours()); 
-	cout << "ASSIGNED HOURS: " << sol.getAssignedHours() << endl;
-	cout << "DEMAND: " << demand << endl;
-	int numNurses = sol.getNumNurses();
-        Candidate c(numNurses, false);
-	generateCandidates(C, c, demand, 0, sol.getAssignedHours(), sol);
+	for (std::list<Candidate>::iterator it=C.begin(); it != C.end(); ){
+		int g = sol.validCandidate((*it).nurse,(*it).hour);
+		(*it).greed=g;
+		if(g<0) it = C.erase(it);
+		else it++;
+	}
 }
 
-void Grasp::generateCandidates(std::list<Candidate> &C, Candidate c, int remaining, int pos, int h, Solution sol){	
-	cout << "POSITION " << pos << endl;
+/*void Grasp::generateCandidates(std::list<Candidate> &C, Candidate c, int remaining, int pos, int h, Solution sol){	
 	if(remaining==0) C.push_back(c);
 	else {
 		if(c.size()-pos == remaining){	//Can only set trues
@@ -72,37 +81,32 @@ void Grasp::generateCandidates(std::list<Candidate> &C, Candidate c, int remaini
 			generateCandidates(C, c, remaining, pos+1,h, sol);
 		}
 	}		
-}
+}*/
 
-std::vector<bool> Grasp::RCL(float alpha, Solution sol, std::list<Candidate> &C){
+Candidate Grasp::RCL(float alpha, Solution sol, std::list<Candidate> &C){
 	int max_greed = 0;
 	int min_greed = 1000; //Use better init
 
-	std::vector<int> greed (C.size(), 0);
-	int i=0;	
-	for (std::list<Candidate>::iterator it=C.begin(); it != C.end(); ++it, ++i){
-		sol.addAssignment(*it);
-		greed[i]=sol.getGreedy();
-		if(greed[i] > max_greed) max_greed=greed[i];
-		else if(greed[i] < min_greed) min_greed=greed[i];	
-		sol.popLastAssignment();
+	for (std::list<Candidate>::iterator it=C.begin(); it != C.end(); ++it){
+		if((*it).greed > max_greed) max_greed=(*it).greed;
+		else if((*it).greed < min_greed) min_greed=(*it).greed;	
 	}
-	int threshold = min_greed + alpha*(max_greed-min_greed);
-	i=0;
-	for (std::list<Candidate>::iterator it=C.begin(); it != C.end(); ++it, ++i)
-		if(greed[i]>threshold) C.erase(it); //Check Correctness
-	
-	Candidate c;
-        int id = rand()%C.size();
-	std::list<Candidate>::iterator it = C.begin();
+	int threshold = (int) min_greed + alpha*(max_greed-min_greed);
+	std::list<Candidate> RCL;
+	for (std::list<Candidate>::iterator it=C.begin(); it != C.end(); ++it){
+		if((*it).greed<=threshold) RCL.push_back(*it); 
+	}
+	Candidate c;       
+	int id = rand()%RCL.size();
+	std::list<Candidate>::iterator it = RCL.begin();
         std::advance(it, id);
         c = (*it);
-        C.clear();
+	C.erase(it);
+	RCL.clear();
         return c;
-
 }
 
-void Grasp::local(Solution sol){
+/*void Grasp::local(Solution sol){
 	std::list<Solution> neighbours;
 	bool better = true;
 	int score, id;

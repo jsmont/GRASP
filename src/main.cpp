@@ -49,7 +49,7 @@ int main(int argc, char* argv[]){
 			patience --;
 			if(alpha<1) alpha+=0.1;
 		}
-		sol.resetAssignments();
+		sol.reset();
 		if(iterations>2) iterations--; //minimum 2 iterations
 	}
 }
