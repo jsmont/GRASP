@@ -22,10 +22,10 @@ int main(int argc, char* argv[]){
 
 	cout << "INPUT DATA READ" << endl;
 
-	int iterations=5;
+	int iterations=1;
 	float alpha=0.2;
 	int score, bestScore;
-	int patience = 3;
+	int patience = 0;
 	
         Solution sol(solparams);
 	Solution bestSol(solparams);

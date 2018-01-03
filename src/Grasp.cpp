@@ -23,27 +23,31 @@ Solution Grasp::executeGrasp(int maxiter, float alpha){
 	return bestSol;
 }
 
-void Grasp::construct(Solution sol, float alpha){
+void Grasp::construct(Solution &sol, float alpha){
+
 	std::list<Candidate> C;	
 	initCandidates(C,sol);
-	int n=0;
+
 	while(!C.empty()){
-		Candidate c;
+		
+        Candidate c;
+
 		c=RCL(alpha,sol, C);
-		sol.addAssignment(c);
+		
+        sol.addAssignment(c);
 		updateCandidates(C,sol);
-		n++;
+
 	}
 }
 
 
-void Grasp::initCandidates(std::list<Candidate> &C, Solution sol){ 
+void Grasp::initCandidates(std::list<Candidate> &C, Solution &sol){ 
 	int numNurses = sol.getNumNurses();
 	int numHours = sol.getNumHours();
 	for(int n=0; n<numNurses; ++n){
 		for(int h=0; h<numHours; ++h){
 			int g = sol.validCandidate(n, h);
-			if(g>0){
+			if(g>=0){
 				Candidate c;
 				c.nurse=n;
 				c.hour=h;
@@ -54,11 +58,13 @@ void Grasp::initCandidates(std::list<Candidate> &C, Solution sol){
 	}
 }
 
-void Grasp::updateCandidates(std::list<Candidate> &C, Solution sol){	
+void Grasp::updateCandidates(std::list<Candidate> &C, Solution &sol){	
 	for (std::list<Candidate>::iterator it=C.begin(); it != C.end(); ){
 		int g = sol.validCandidate((*it).nurse,(*it).hour);
 		(*it).greed=g;
-		if(g<0) it = C.erase(it);
+		if(g<0) {
+            it = C.erase(it);
+        }
 		else it++;
 	}
 }
@@ -83,7 +89,7 @@ void Grasp::updateCandidates(std::list<Candidate> &C, Solution sol){
 	}		
 }*/
 
-Candidate Grasp::RCL(float alpha, Solution sol, std::list<Candidate> &C){
+Candidate Grasp::RCL(float alpha, Solution &sol, std::list<Candidate> &C){
 	int max_greed = 0;
 	int min_greed = 1000; //Use better init
 
@@ -98,10 +104,14 @@ Candidate Grasp::RCL(float alpha, Solution sol, std::list<Candidate> &C){
 	}
 	Candidate c;       
 	int id = rand()%RCL.size();
+
 	std::list<Candidate>::iterator it = RCL.begin();
-        std::advance(it, id);
-        c = (*it);
-	C.erase(it);
+    std::advance(it, id);
+
+    c = (*it);
+
+	C.remove(c);
+
 	RCL.clear();
         return c;
 }

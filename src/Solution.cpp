@@ -62,7 +62,7 @@ int Solution::getScore(){
 }
 
 int Solution::getGreedy(int n, int h){ //obviously will have to tune and stuff
-	return score=10*(nurses_working[h]+1>demand[h])+(score+!nurse_works[n]);
+	return score + !nurse_works[n];
 }
 
 int Solution::getDemand(int h){

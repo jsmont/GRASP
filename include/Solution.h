@@ -14,10 +14,13 @@ typedef struct {
     int maxPresence;
 } SolutionParams;
 
-typedef struct {
+typedef struct Candidate{
 	int nurse;
         int hour;
 	int greed;
+    bool operator==(const Candidate& c) const {
+        return (c.nurse == nurse) && (c.hour == hour);
+    }
 } Candidate;
 
 
