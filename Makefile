@@ -2,29 +2,29 @@ IDIR =./include
 CC=g++
 CFLAGS=-I$(IDIR) -O3 -march=native #-g
 DEFINES=
-INSTANCE=
+INSTANCE=main
 
 SDIR=./src
 
 _DEPS = Grasp.h Solution.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = Grasp.o Solution.o
+_OBJ = Grasp.o Solution.o 
 OBJ = $(patsubst %,$(SDIR)/%,$(_OBJ))
 
 
 %.o:%.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS) $(DEFINES)
 
-all: main 
+all: $(INSTANCE) 
 
-parallel: CFLAGS += -fopenmp
-parallel: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS) $(DEFINES)
+#parallel: CFLAGS += -fopenmp
+#parallel: $(OBJ)
+#	$(CC) -o $@ $^ $(CFLAGS) $(DEFINES)
 
-dummy: INSTANCE = main
-dummy: src/main.o
-dummy: main
+#dummy: INSTANCE = main
+#dummy: src/main.o
+#dummy: main
 
 #tasksc: INSTANCE = tasks_to_computer
 #tasksc: src/tasks_to_computer.o
@@ -35,8 +35,8 @@ dummy: main
 #nurses: src/nurses.o
 #nurses: main
 
-main: $(OBJ) 
-	$(CC) -o $(INSTANCE) src/$(INSTANCE).o $^ $(CFLAGS) $(DEFINES)
+main: $(OBJ) src/$(INSTANCE).o
+	$(CC) -o $(INSTANCE) $^ $(CFLAGS) $(DEFINES)
 
 #generator: src/instance_generator.cpp
 #	$(CC) -o $@ $<

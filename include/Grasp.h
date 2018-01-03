@@ -8,8 +8,10 @@
 class Grasp {
 	typedef std::vector<bool> Candidate;
 	
+	SolutionParams params;
+	
 	public:
-		Grasp();
+		Grasp(SolutionParams params);
 		Solution executeGrasp(int maxiter, float alpha);
 
 	private:	

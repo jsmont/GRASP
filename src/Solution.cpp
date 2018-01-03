@@ -2,7 +2,7 @@
 
 Solution::Solution(SolutionParams parameters){
     this->total_assignments=parameters.numHours;
-    this->works = vector<vector<bool> >(parameters.numHours,vector<bool>(parameters.numNurses,false));
+    this->works = vector<vector<bool> >(parameters.numNurses,vector<bool>(parameters.numHours,false));
     this->nurse_works = vector<bool>(parameters.numNurses, false);
     this->demand = vector<int>(parameters.numHours);
     demand = parameters.demand; //Can do it in a single expression?
@@ -51,13 +51,13 @@ int Solution::getScore(){
 }
 
 int Solution::getGreedy(){ //obviously will have to tune and stuff
-    int diff;
+   /* int diff;
 
     for (int h=0; h<assignments; h++){
 	if(nurses_working[h]<demand[h]) diff += 50*(demand[h]-nurses_working[h]);
 	else diff += 5*(nurses_working[h] - demand[h]);
-    }
-    return diff-score;
+    }*/
+    return nurses_working[assignments]-score; //if score increased -> 0; otherwise will be negative
 }
 
 int Solution::getDemand(int h){

@@ -1,20 +1,24 @@
 #include "Grasp.h"
 #include <stdlib.h>
 
-Grasp::Grasp(){
+Grasp::Grasp(SolutionParams params){
+	this->params=params;
 }
 
 Solution Grasp::executeGrasp(int maxiter, float alpha){ 
-	SolutionParams solparams;
-	//param init
-	Solution bestSol(solparams);
-
+	Solution bestSol(params);
+	cout << "STARTING GRASP" << endl;
+	cout << "ITERATIONS: " << maxiter << endl;
+	cout << "ALPHA: " << alpha << endl;
 	for(int k = 0; k < maxiter; k++){
-		Solution sol(solparams);
+		Solution sol(params);	
+		cout << "Construction Phase" << endl;
 		construct(sol,alpha);
+		cout << "Local Search" << endl;
 		local(sol);
-		if (sol.getScore() < bestSol.getScore()) bestSol=sol;
-		//Added a Score field for Solution class to avoid to compute it again
+		cout << "Score: " << sol.getScore() << endl;
+		if (sol.getScore() < bestSol.getScore()) bestSol=sol;		
+		cout << "Current best score: " << bestSol.getScore() << endl;
 	}
 	return bestSol;
 }
@@ -22,7 +26,7 @@ Solution Grasp::executeGrasp(int maxiter, float alpha){
 void Grasp::construct(Solution sol, float alpha){
 	std::list<Candidate> C;	
 	initCandidates(C,sol);
-	while(!sol.isComplete()){			
+	while(!sol.isComplete()){
 		sol.addAssignment(RCL(alpha,sol, C));
 		updateCandidates(C,sol);
 	}
@@ -30,6 +34,7 @@ void Grasp::construct(Solution sol, float alpha){
 
 
 void Grasp::initCandidates(std::list<Candidate> &C, Solution sol){ //Since we are doing incrementally by hours, first hour is trivial. Could add in other order
+
 	C.clear(); //just in case
 	int demand = sol.getDemand(0); //probably not necessary to get them from solution
 	int numNurses = sol.getNumNurses();
@@ -40,23 +45,26 @@ void Grasp::initCandidates(std::list<Candidate> &C, Solution sol){ //Since we ar
 
 void Grasp::updateCandidates(std::list<Candidate> &C, Solution sol){	
 	C.clear();
-	int demand = sol.getDemand(sol.getAssignedHours());
-        int numNurses = sol.getNumNurses();
+	int demand = sol.getDemand(sol.getAssignedHours()); 
+	cout << "ASSIGNED HOURS: " << sol.getAssignedHours() << endl;
+	cout << "DEMAND: " << demand << endl;
+	int numNurses = sol.getNumNurses();
         Candidate c(numNurses, false);
 	generateCandidates(C, c, demand, 0, sol.getAssignedHours(), sol);
 }
 
 void Grasp::generateCandidates(std::list<Candidate> &C, Candidate c, int remaining, int pos, int h, Solution sol){	
+	cout << "POSITION " << pos << endl;
 	if(remaining==0) C.push_back(c);
 	else {
-		if(C.size()-pos == remaining){	//Can only set trues
+		if(c.size()-pos == remaining){	//Can only set trues
 			if(sol.validCandidate(pos, h)) {
 				c[pos]=true;
 				generateCandidates(C, c, remaining-1, pos+1, h, sol);
 			}
-		}	
+		}
 		else {
-			if(sol.validCandidate(pos, h)) {
+			if(sol.validCandidate(pos, h)) { 
 				c[pos]=true;
 				generateCandidates(C, c, remaining-1, pos+1,h, sol);
 			}
