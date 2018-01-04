@@ -34,15 +34,11 @@ void Grasp::construct(Solution &sol, float alpha){
 	std::list<Candidate> C;	
 	initCandidates(C,sol);
 
-	while(!C.empty()){
-		
-        Candidate c;
-
+	while(!C.empty()){	
+        	Candidate c;
 		c=RCL(alpha,sol, C);
-		
-        sol.addAssignment(c);
+		sol.addAssignment(c);
 		updateCandidates(C,sol);
-
 	}
 }
 
@@ -50,13 +46,13 @@ void Grasp::construct(Solution &sol, float alpha){
 void Grasp::initCandidates(std::list<Candidate> &C, Solution &sol){ 
 	int numNurses = sol.getNumNurses();
 	int numHours = sol.getNumHours();
+	Candidate c;
 	for(int n=0; n<numNurses; ++n){
+		c.nurse=n;
 		for(int h=0; h<numHours; ++h){
 			int g = sol.validCandidate(n, h);
 			if(g>=0){
-				Candidate c;
-				c.nurse=n;
-				c.hour=h;
+				c.hour=h;	
 				c.greed=g;
 				C.push_back(c);
 			}
@@ -68,32 +64,10 @@ void Grasp::updateCandidates(std::list<Candidate> &C, Solution &sol){
 	for (std::list<Candidate>::iterator it=C.begin(); it != C.end(); ){
 		int g = sol.validCandidate((*it).nurse,(*it).hour);
 		(*it).greed=g;
-		if(g<0) {
-            it = C.erase(it);
-        }
+		if(g<0) it = C.erase(it); 
 		else it++;
 	}
 }
-
-/*void Grasp::generateCandidates(std::list<Candidate> &C, Candidate c, int remaining, int pos, int h, Solution sol){	
-	if(remaining==0) C.push_back(c);
-	else {
-		if(c.size()-pos == remaining){	//Can only set trues
-			if(sol.validCandidate(pos, h)) {
-				c[pos]=true;
-				generateCandidates(C, c, remaining-1, pos+1, h, sol);
-			}
-		}
-		else {
-			if(sol.validCandidate(pos, h)) { 
-				c[pos]=true;
-				generateCandidates(C, c, remaining-1, pos+1,h, sol);
-			}
-			c[pos]=false;
-			generateCandidates(C, c, remaining, pos+1,h, sol);
-		}
-	}		
-}*/
 
 Candidate Grasp::RCL(float alpha, Solution &sol, std::list<Candidate> &C){
 	int max_greed = 0;
@@ -113,9 +87,9 @@ Candidate Grasp::RCL(float alpha, Solution &sol, std::list<Candidate> &C){
 	int id = rd()%RCL.size();
 
 	std::list<Candidate>::iterator it = RCL.begin();
-    std::advance(it, id);
+	std::advance(it, id);
 
-    c = (*it);
+    	c = (*it);
 
 	C.remove(c);
 
@@ -139,24 +113,32 @@ bool Grasp::findNeighbours(Solution &sol){
 	int id;
 	int n2,h2;
 	bool better = false;
-	vector<vector<bool> > works (numNurses,vector<bool>(numHours));
-	works = sol.getAssignments();
+
+	Solution bestSol(params);
+	bestSol.copy(sol);
+
 	std::list<Candidate> assigned, unassigned;
 	Candidate c;
 	for(int n=0; n<numNurses; n++){ //get all not assigned candidates
 		c.nurse=n;
 		for(int h=0; h<numHours; h++){
 			c.hour=h;
-			if(works[n][h])	assigned.push_back(c);
+			if(sol.getWorks(n,h))assigned.push_back(c);
 			else unassigned.push_back(c);
 		}
 	}
 	
+	cout << "STARTING PERMUTATIONS";
 	int perm =2;
-	Solution bestSol(params);
-	bestSol.copy(sol);
+
 	perm_assigned(assigned, unassigned, sol, bestSol, perm, perm);
+	cout << endl;
+	
+	assigned.clear();
+	unassigned.clear();	
+
 	if(bestSol.getScore()<sol.getScore()){
+		cout << "PREV SCORE: " << sol.getScore() << " CURR SCORE: " << bestSol.getScore() << endl;
 		sol.copy(bestSol);
 		return true;
 	}
@@ -175,14 +157,14 @@ void Grasp::perm_assigned(std::list<Candidate> &assigned, std::list<Candidate> &
 		}
 	}
 	else {
-		cout << "PERMUTATING UNASSIGNED" << endl;	
+		cout << ".";	
 		perm_unassigned(unassigned, sol, bestSol, perm);
 	}
 }
 
 void Grasp::perm_unassigned(std::list<Candidate> &unassigned, Solution &sol, Solution &bestSol, int remain){
 	if(remain > 0){
-                for (std::list<Candidate>::iterator it=unassigned.begin(); it != unassigned.end(); ++it){
+               	 for (std::list<Candidate>::iterator it=unassigned.begin(); it != unassigned.end(); ++it){
                         Candidate c = *it;
                         if(sol.validCandidate(c.nurse, c.hour)>=0){
 				it = unassigned.erase(it);
@@ -193,10 +175,5 @@ void Grasp::perm_unassigned(std::list<Candidate> &unassigned, Solution &sol, Sol
 			}
                 }
         }
-        else{
-	 	if(sol.getScore()<bestSol.getScore()){
-			bestSol.copy(sol);
-			cout << "BETTER SOLUTION FOUND" << endl;
-		}
-	}
+        else if(sol.getScore()<bestSol.getScore()) bestSol.copy(sol);
 }

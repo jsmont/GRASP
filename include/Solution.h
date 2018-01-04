@@ -58,6 +58,7 @@ public:
     void updateNurseWorks(int n);
     void copy(Solution &sol);
     vector<int> getNursesWorking();     
+    bool getWorks(int n, int h);
 
 private:
     

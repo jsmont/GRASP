@@ -67,7 +67,6 @@ int Solution::getNumHours(){
     return numHours;
 }
 
-
 vector<bool> Solution::getNurseWorks(){
     return nurse_works;
 }
@@ -135,11 +134,11 @@ int Solution::validCandidate(int n, int h){
 	return -1;
 }
 
-
 void Solution::removeCandidate(Candidate c){
 	works[c.nurse][c.hour]=false;
 	updateNurseWorks(c.nurse);
 	nurses_working[c.hour]--;
+	if(!nurse_works[c.nurse]) score--;
 }
 
 void Solution::updateNurseWorks(int n){
@@ -157,4 +156,8 @@ void Solution::copy(Solution &sol){
 
 vector<int> Solution::getNursesWorking(){
 	return nurses_working;
+}
+
+bool Solution::getWorks(int n, int h){
+	return works[n][h];
 }
