@@ -19,7 +19,7 @@ class Grasp {
 		Candidate RCL(float alpha, Solution &sol, std::list<Candidate> &C);
 		void local(Solution &sol);
 		bool findNeighbours(Solution &sol);
-		void perm_assigned(std::list<Candidate> &assigned, std::list<Candidate> &unassigned, Solution &sol, Solution &bestSol, int remain, int perm);
-		void perm_unassigned(std::list<Candidate> &unassigned, Solution &sol, Solution &bestSol, int remain);
+		static void perm_assigned(std::list<Candidate> &assigned, std::list<Candidate> &unassigned, Solution &sol, Solution &bestSol, int remain, int perm);
+		static void perm_unassigned(std::list<Candidate> &unassigned, Solution &sol, Solution &bestSol, int remain);
 };
 #endif

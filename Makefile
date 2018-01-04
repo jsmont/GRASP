@@ -35,6 +35,9 @@ all: $(INSTANCE)
 #nurses: src/nurses.o
 #nurses: main
 
+debug: CFLAGS = -I$(IDIR) -g
+debug: main
+
 main: $(OBJ) src/$(INSTANCE).o
 	$(CC) -o $(INSTANCE) $^ $(CFLAGS) $(DEFINES)
 
