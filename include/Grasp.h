@@ -16,12 +16,10 @@ class Grasp {
 		void construct(Solution &sol, float alpha);
 		void initCandidates(std::list<Candidate> &C, Solution &sol);
 		void updateCandidates(std::list<Candidate> &C, Solution &sol);
-		//void generateCandidates(std::list<Candidate> &C, Candidate c, int remaining, int pos, int h, Solution sol);
 		Candidate RCL(float alpha, Solution &sol, std::list<Candidate> &C);
-		//void local(Solution sol);
-		//void findNeighbours(Solution sol, std::list<Solution> neighbours);
-		//void generateNeighbours(Solution sol, std::list<Solution> neighbours, int h1, int h2, int h);
-		//void generateNeighbours(Solution sol, std::list<Solution> neighbours, int h1, int h2);	
-//		void generateCandidates(std::list<Candidate> &C, Candidate c, int remaining, int pos, std::vector<bool> nurse_works;
+		void local(Solution &sol);
+		bool findNeighbours(Solution &sol);
+		void perm_assigned(std::list<Candidate> &assigned, std::list<Candidate> &unassigned, Solution &sol, Solution &bestSol, int remain, int perm);
+		void perm_unassigned(std::list<Candidate> &unassigned, Solution &sol, Solution &bestSol, int remain);
 };
 #endif

@@ -28,18 +28,6 @@ void Solution::addAssignment(Candidate c){
     nurse_works[c.nurse]=true;
 }
 
-/*void Solution::popLastAssignment(){
-    assignments--;
-    nurses_working[assignments]=0;
-    updateNurseWorks(); //Otherwise getScore() is incorrect
-}*/
-
-/*void Solution::addAssignment(vector<bool> new_assignment, int h){ //Overwrites assignment h, use only in local search
-    works[h] = new_assignment;
-    updateNursesWorking(assignments);
-    updateNurseWorks();
-}*/
-
 vector<vector<bool> > Solution::getAssignments(){
     return works;
 }
@@ -49,7 +37,9 @@ void Solution::reset(){
 		for(int h=0;h<numHours;h++){
 			works[n][h]=false;
 			score=0;
+			nurses_working[h]=0;
 		}
+		nurse_works[n]=false;
 	}
 }
 
@@ -77,33 +67,10 @@ int Solution::getNumHours(){
     return numHours;
 }
 
+
 vector<bool> Solution::getNurseWorks(){
     return nurse_works;
 }
-
-/*int Solution::getAssignedHours(){
-	return assignments;
-}*/
-
-/*void Solution::updateNurseWorks(){ //do we really need to check all hours? better just the assigned / unassigned one (only check previous if unassigning and under some conditions) 
-    int workingNurses=0;
-    for(int n = 0; n < nurse_works.size(); ++n){
-        bool nworks = false;
-        for(int h = 0; h < assignments && !nworks; ++h){
-            nworks |= works[h][n];
-        }
-        nurse_works[n] = nworks;
-	workingNurses+=nurse_works[n];
-    }
-    score=workingNurses;
-}
-
-//Maybe can merge with previous function
-void Solution::updateNursesWorking(int h){
-	for (int n = 0; n < nurse_works.size(); ++n){
-		nurses_working[h] += works[h][n];
-	}
-}*/
 
 bool Solution::validSolution(){
 
@@ -157,6 +124,7 @@ bool Solution::validSolution(int n){
 	}	
 	return true;
 }
+
 int Solution::validCandidate(int n, int h){
 	if(works[n][h]) return -1;
 	if(demand[h]<=nurses_working[h]) return -1;
@@ -165,4 +133,28 @@ int Solution::validCandidate(int n, int h){
 	works[n][h] = false;
 	if(valid) return getGreedy(n,h);
 	return -1;
+}
+
+
+void Solution::removeCandidate(Candidate c){
+	works[c.nurse][c.hour]=false;
+	updateNurseWorks(c.nurse);
+	nurses_working[c.hour]--;
+}
+
+void Solution::updateNurseWorks(int n){
+	nurse_works[n]=false;	
+	for(int h=0; h<numHours; h++) nurse_works[n] = works[n][h] || nurse_works[n];
+}
+
+void Solution::copy(Solution &sol){
+	reset();
+	works=sol.getAssignments();
+	score=sol.getScore();
+	nurse_works = sol.getNurseWorks();
+	nurses_working = sol.getNursesWorking();	
+}
+
+vector<int> Solution::getNursesWorking(){
+	return nurses_working;
 }

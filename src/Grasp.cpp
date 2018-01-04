@@ -1,5 +1,7 @@
 #include "Grasp.h"
 #include <stdlib.h>
+#include <iterator>
+#include <random>
 
 Grasp::Grasp(SolutionParams params){
 	this->params=params;
@@ -7,6 +9,7 @@ Grasp::Grasp(SolutionParams params){
 
 Solution Grasp::executeGrasp(int maxiter, float alpha){ 
 	Solution bestSol(params);
+	int bestScore = bestSol.getNumNurses();
 	cout << "STARTING GRASP" << endl;
 	cout << "ITERATIONS: " << maxiter << endl;
 	cout << "ALPHA: " << alpha << endl;
@@ -15,10 +18,13 @@ Solution Grasp::executeGrasp(int maxiter, float alpha){
 		cout << "Construction Phase" << endl;
 		construct(sol,alpha);
 		cout << "Local Search" << endl;
-		//local(sol);
+		local(sol);
 		cout << "Score: " << sol.getScore() << endl;
-		if (sol.getScore() < bestSol.getScore()) bestSol=sol;		
-		cout << "Current best score: " << bestSol.getScore() << endl;
+		if (sol.getScore() < bestScore){
+			bestSol=sol;		
+			bestScore=sol.getScore();
+		}
+		cout << "Current best score: " << bestScore << endl;
 	}
 	return bestSol;
 }
@@ -103,7 +109,8 @@ Candidate Grasp::RCL(float alpha, Solution &sol, std::list<Candidate> &C){
 		if((*it).greed<=threshold) RCL.push_back(*it); 
 	}
 	Candidate c;       
-	int id = rand()%RCL.size();
+	std::random_device rd;
+	int id = rd()%RCL.size();
 
 	std::list<Candidate>::iterator it = RCL.begin();
     std::advance(it, id);
@@ -116,80 +123,80 @@ Candidate Grasp::RCL(float alpha, Solution &sol, std::list<Candidate> &C){
         return c;
 }
 
-/*void Grasp::local(Solution sol){
-	std::list<Solution> neighbours;
+void Grasp::local(Solution &sol){
 	bool better = true;
-	int score, id;
 	while(better){
-		score = sol.getScore();
-		better=false;
-		findNeighbours(sol, neighbours);
-		int i=0;
-		for (std::list<Solution>::iterator it=neighbours.begin(); it != neighbours.end(); ++it, ++i){
-                	if((*it).getScore() < score){
-				score = (*it).getScore();
-				id = i;
-				better=true;			
-			}			
-		}
-		if (better){
-			std::list<Solution>::iterator it = neighbours.begin();
-			std::advance(it, id);
-		 	sol = (*it);
-		}
-	}	
+		better = findNeighbours(sol);	
+		if(better) cout << "FOUND A BETTER NEIGHBOUR" << endl;
+		else cout << "NO BETTER NEIGHBOUR FOUND" << endl;
+	}
 }
 
-void Grasp::findNeighbours(Solution sol, std::list<Solution> neighbours){
-	generateNeighbours(sol, neighbours, -1, -1, 0);
-}
-
-void Grasp::generateNeighbours(Solution sol, std::list<Solution> neighbours, int h1, int h2, int h){
-        if(h2<0 && h < sol.getNumHours()) {
-		if(h1<0) generateNeighbours(sol, neighbours, h, h2, h+1); //fill h1
-		else generateNeighbours(sol, neighbours, h1, h, h+1);	//fill h2
-		generateNeighbours(sol, neighbours, h1, h2, h+1);	//fill none
-        }
-	else generateNeighbours(sol, neighbours, h1, h2);
-}
-
-void Grasp::generateNeighbours(Solution sol, std::list<Solution> neighbours, int h1, int h2){
-	std:list<Candidate> C1, C2;
+bool Grasp::findNeighbours(Solution &sol){
+	int numNurses = sol.getNumNurses();
+	int numHours = sol.getNumHours();
+	int score = sol.getScore();
+	int id;
+	int n2,h2;
+	bool better = false;
+	vector<vector<bool> > works (numNurses,vector<bool>(numHours));
+	works = sol.getAssignments();
+	std::list<Candidate> assigned, unassigned;
 	Candidate c;
-        int demand1 = sol.getDemand(h1);
-	int demand2 = sol.getDemand(h2);
-        int numNurses = sol.getNumNurses();
-//	std::vector<bool> nurse_works(numNurses);
-//	nurse_works=sol.getNurseWorks();
-        Candidate c1(numNurses, false);
-	Candidate c2(numNurses, false);
-        generateCandidates(C1, c1, demand1, 0, h1, sol);
-	generateCandidates(C2, c2, demand2, 0 ,h2, sol);
- 
-	for (std::list<Candidate>::iterator it1=C1.begin(); it1 != C1.end(); ++it1){
- 		for (std::list<Candidate>::iterator it2=C1.begin(); it2 != C2.end(); ++it2){ 
-			sol.addAssignment(*it1,h1);
-			sol.addAssignment(*it2,h2);
-			if(sol.validSolution())neighbours.push_back(sol);
+	for(int n=0; n<numNurses; n++){ //get all not assigned candidates
+		c.nurse=n;
+		for(int h=0; h<numHours; h++){
+			c.hour=h;
+			if(works[n][h])	assigned.push_back(c);
+			else unassigned.push_back(c);
 		}
-        }	
+	}
 	
-}	
+	int perm =2;
+	Solution bestSol(params);
+	bestSol.copy(sol);
+	perm_assigned(assigned, unassigned, sol, bestSol, perm, perm);
+	if(bestSol.getScore()<sol.getScore()){
+		sol.copy(bestSol);
+		return true;
+	}
+	return false;
+}
 
-/*void Grasp::generateCandidates(std::list<Candidate> &C, Candidate c, int remaining, int posstd::vector<bool> nurse_works){
-        if(remaining==0) C.push_back(c);
-        else {
-                if(C.size()-pos == remaining && nurse_works[pos]){ 
-                        c[pos]=true;
-                        generateCandidate(C, c, remaining-1, pos+1);
-                }
-                else {
-                        if(nurse_works[pos]{
-				c[pos]=true;
-                        	generateCandidate(C, c, remaining-1, pos+1);
-                        }
-			c[pos]=false;
-                        generateCandidate(C, c, remaining, pos+1);
+void Grasp::perm_assigned(std::list<Candidate> &assigned, std::list<Candidate> &unassigned, Solution &sol, Solution &bestSol, int remain, int perm){
+	if(remain > 0){
+		for (std::list<Candidate>::iterator it=assigned.begin(); it != assigned.end(); ++it){
+			Candidate c = *it;
+			it = assigned.erase(it);
+			sol.removeCandidate(c);
+			perm_assigned(assigned, unassigned, sol, bestSol, remain-1, perm);
+			sol.addAssignment(c);
+			it = assigned.insert(it,c);
+		}
+	}
+	else {
+		cout << "PERMUTATING UNASSIGNED" << endl;	
+		perm_unassigned(unassigned, sol, bestSol, perm);
+	}
+}
+
+void Grasp::perm_unassigned(std::list<Candidate> &unassigned, Solution &sol, Solution &bestSol, int remain){
+	if(remain > 0){
+                for (std::list<Candidate>::iterator it=unassigned.begin(); it != unassigned.end(); ++it){
+                        Candidate c = *it;
+                        if(sol.validCandidate(c.nurse, c.hour)>=0){
+				it = unassigned.erase(it);
+                        	sol.addAssignment(c);
+				perm_unassigned(unassigned, sol, bestSol, remain-1);
+				sol.removeCandidate(c);
+				it = unassigned.insert(it,c);
+			}
                 }
         }
-}*/
+        else{
+	 	if(sol.getScore()<bestSol.getScore()){
+			bestSol.copy(sol);
+			cout << "BETTER SOLUTION FOUND" << endl;
+		}
+	}
+}

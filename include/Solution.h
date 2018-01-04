@@ -42,8 +42,6 @@ public:
 
     Solution(SolutionParams parameters);
     bool isComplete();
-    //void addAssignment(vector<bool> new_assignment);
-    //void popLastAssignment();
     void addAssignment(Candidate c);
     vector<vector<bool> > getAssignments();
     void reset();
@@ -52,16 +50,17 @@ public:
     int getDemand(int h);
     int getNumNurses();
     int getNumHours();
-    //int getAssignedHours();
     vector<bool> getNurseWorks();
     bool validSolution();
     bool validSolution(int n);
     int validCandidate(int n, int h);
+    void removeCandidate(Candidate c);
+    void updateNurseWorks(int n);
+    void copy(Solution &sol);
+    vector<int> getNursesWorking();     
 
 private:
     
-    //void updateNurseWorks();
-    //void updateNursesWorking(int h);
 };
 
 #endif
