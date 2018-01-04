@@ -107,21 +107,14 @@ void Grasp::local(Solution &sol){
 }
 
 bool Grasp::findNeighbours(Solution &sol){
-	int numNurses = sol.getNumNurses();
-	int numHours = sol.getNumHours();
-	int score = sol.getScore();
-	int id;
-	int n2,h2;
-	bool better = false;
-
 	Solution bestSol(params);
 	bestSol.copy(sol);
 
 	std::list<Candidate> assigned, unassigned;
 	Candidate c;
-	for(int n=0; n<numNurses; n++){ //get all not assigned candidates
+	for(int n=0; n<sol.getNumNurses(); n++){ 
 		c.nurse=n;
-		for(int h=0; h<numHours; h++){
+		for(int h=0; h<sol.getNumHours(); h++){
 			c.hour=h;
 			if(sol.getWorks(n,h))assigned.push_back(c);
 			else unassigned.push_back(c);
@@ -129,13 +122,14 @@ bool Grasp::findNeighbours(Solution &sol){
 	}
 	
 	cout << "STARTING PERMUTATIONS";
-	int perm =2;
 
+	int perm =2;
 	perm_assigned(assigned, unassigned, sol, bestSol, perm, perm);
+
 	cout << endl;
 	
-	assigned.clear();
-	unassigned.clear();	
+//	assigned.clear();
+//	unassigned.clear();	
 
 	if(bestSol.getScore()<sol.getScore()){
 		cout << "PREV SCORE: " << sol.getScore() << " CURR SCORE: " << bestSol.getScore() << endl;
@@ -158,7 +152,7 @@ void Grasp::perm_assigned(std::list<Candidate> &assigned, std::list<Candidate> &
 	}
 	else {
 		cout << ".";	
-		perm_unassigned(unassigned, sol, bestSol, perm);
+		perm_unassigned(unassigned, sol, bestSol, perm); 
 	}
 }
 
