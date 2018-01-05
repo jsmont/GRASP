@@ -108,7 +108,38 @@ int Solution::getScore(){
     return score;
 
 }
+	
+float Solution::getDevStd(){
+    vector<int> nworks = vector<int>(numNurses,0);
 
+    for(int n = 0; n < numNurses; ++n){
+        if(nurse_works[n]){
+            for(int h = 0; h < numHours; ++h){
+                nworks[n]+=works[n][h];
+            }
+        }
+    }
+
+    float avg = 0;
+    for(int i = 0; i < nworks.size(); ++i){
+        avg += (float)nworks[i];///(float)score;
+    }
+    avg=(float)avg/score;
+
+    float sq_sum = 0;
+
+    for(int i = 0; i < nworks.size(); ++i){
+        if(nworks[i] != 0)
+            sq_sum += (nworks[i] - avg)*(nworks[i] - avg);
+    }
+
+    float std = sq_sum/score;
+
+//    float max_std = (maxHours/2)*(maxHours/2);
+
+//    float normalized_std = std/max_std;
+     return std;
+}
 
 int Solution::getGreedy(int n, int h){ //obviously will have to tune and stuff
     return score + !nurse_works[n];
@@ -252,9 +283,9 @@ bool Solution::isFeasible(int h, int n){
 int Solution::validCandidate(int n, int h){
     if(works[n][h]) return -1;
     if(demand[h]<=nurses_working[h]) return -1;
-    works[n][h] = true;
+//    works[n][h] = true;
     bool valid = isFeasible(h,n);
-    works[n][h] = false;
+//    works[n][h] = false;
     if(valid) return getGreedy(n,h);
     return -1;
 }

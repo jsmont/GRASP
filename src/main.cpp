@@ -22,7 +22,7 @@ int main(int argc, char* argv[]){
 
 	cout << "INPUT DATA READ" << endl;
 
-	int iterations=10;
+	int iterations=5;
 	float alpha=0.2;
 	int score, bestScore;
 	int patience = 2;
@@ -38,11 +38,16 @@ int main(int argc, char* argv[]){
 	bestScore=bestSol.getScore();
 
 	while(patience > 0){
+
+		cout << " -------------------------------------- " << endl;
+		cout << " ------------ RUNNING GRASP ----------- " << endl;
+		cout << " -------------------------------------- " << endl;
+
 		sol=g.executeGrasp(iterations,alpha);
 	        score=sol.getScore();	
-		if(score>bestScore){
+		if(score<bestScore){
 			bestScore=score;
-			bestSol=sol;
+			bestSol.copy(sol);
 			patience++;
 		}
 		else{
@@ -53,5 +58,6 @@ int main(int argc, char* argv[]){
 		if(iterations>2) iterations--; //minimum 2 iterations
 	}
 
-    cout << "ABSOLUTE BEST SCORE: " << bestSol.getScore() << endl;
+    cout << endl << endl;
+    cout << "FINAL BEST SCORE: " << bestSol.getScore() << endl;
 }

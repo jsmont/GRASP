@@ -45,6 +45,7 @@ public:
     vector<vector<bool> > getAssignments();
     void reset();
     int getScore();
+    float getDevStd();
     int getGreedy(int n, int h);
     int getDemand(int h);
     int getNumNurses();
