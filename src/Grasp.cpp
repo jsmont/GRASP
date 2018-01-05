@@ -147,13 +147,15 @@ bool Grasp::findNeighbours(Solution &sol){
 		sol.removeCandidate(c1);
 		for (std::list<Candidate>::iterator it2=unassigned.begin(); it2 != unassigned.end(); ++it2){
 			Candidate c2 = *it2;
-			if(sol.validCandidate(c2.nurse, c2.hour)>=0){
-				sol.addAssignment(c2);
-				if(sol.getScore()<bestSol.getScore() || (sol.getScore()==bestSol.getScore() && sol.getDevStd()>bestSol.getDevStd())){
-					bestSol.copy(sol);
-					better=true;
+			if(c2.hour==c1.hour){
+				if(sol.validCandidate(c2.nurse, c2.hour)>=0){
+					sol.addAssignment(c2);
+					if(sol.getScore()<bestSol.getScore() || (sol.getScore()==bestSol.getScore() && sol.getDevStd()>bestSol.getDevStd())){
+						bestSol.copy(sol);
+						better=true;
+					}
+					sol.removeCandidate(c2);
 				}
-				sol.removeCandidate(c2);
 			}
 		}		                        
 		sol.addAssignment(c1);	
