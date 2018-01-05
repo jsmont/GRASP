@@ -25,8 +25,7 @@ int main(int argc, char* argv[]){
 	int iterations=5;
 	float alpha=0.2;
 	int score, bestScore;
-	int patience = 2;
-	
+	//int patience = 2;	
         Solution sol(solparams);
 	Solution bestSol(solparams);
 
@@ -34,10 +33,11 @@ int main(int argc, char* argv[]){
 	cout << "GRASP INIT" << endl;
 
 	Grasp g(solparams); //do a better iterating system, changing alpha and stuff
+	//int best=g.getBest();
 	bestSol=g.executeGrasp(iterations,alpha); 
 	bestScore=bestSol.getScore();
 
-	while(patience > 0){
+	/*while(patience > 0){
 
 		cout << " -------------------------------------- " << endl;
 		cout << " ------------ RUNNING GRASP ----------- " << endl;
@@ -56,8 +56,9 @@ int main(int argc, char* argv[]){
 		}
 		sol.reset();
 		if(iterations>2) iterations--; //minimum 2 iterations
-	}
+	}*/
 
-    cout << endl << endl;
-    cout << "FINAL BEST SCORE: " << bestSol.getScore() << endl;
+    	cout << endl << endl;
+	if(bestSol.getScore()==0) cout << "SOLUTION UNFEASIBLE" << endl;
+	else    cout << "FINAL BEST SCORE: " << bestSol.getScore() << endl;
 }

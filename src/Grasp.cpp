@@ -5,6 +5,14 @@
 
 Grasp::Grasp(SolutionParams params){
 	this->params=params;
+	this->best=0;
+	for(int i=0; i<params.numHours; i++){
+		if(params.demand[i]>best) best=params.demand[i];
+	}
+}	
+
+int Grasp::getBest(){
+	return best;
 }
 
 Solution Grasp::executeGrasp(int maxiter, float alpha){ 
@@ -13,21 +21,27 @@ Solution Grasp::executeGrasp(int maxiter, float alpha){
 	cout << "STARTING GRASP" << endl;
 	cout << "ITERATIONS: " << maxiter << endl;
 	cout << "ALPHA: " << alpha << endl;
+	#pragma omp parallel for schedule(dynamic,1)
 	for(int k = 0; k < maxiter; k++){
-		cout << "ITERATION: " << k << endl;
-		Solution sol(params);	
-		cout << "Construction Phase" << endl;
-		construct(sol,alpha);
-		cout << "Score: " << (int)sol.getScore()<< endl;
-		cout << "Local Search" << endl;
-		local(sol);
-		cout << "Score: " << (int)sol.getScore()<< endl;
-		if ((int)sol.getScore()< bestScore){
-			bestSol=sol;		
-			bestScore=(int)sol.getScore();
+		if(bestSol.getScore()!=best){
+			cout << "ITERATION: " << k << endl;
+			Solution sol(params);	
+			cout << "Construction Phase" << endl;
+			construct(sol,alpha);
+			cout << "Score: " << (int)sol.getScore()<< endl;
+			cout << "Local Search" << endl;
+			local(sol);
+			cout << "Score: " << (int)sol.getScore()<< endl;
+			#pragma omp critical 
+			{
+			if ((int)sol.getScore()< bestScore){
+				bestSol=sol;		
+				bestScore=(int)sol.getScore();
+			}
+			}
+			cout << "CURRENT BEST SCORE: " << bestScore << endl;
+			cout << "----------------------" << endl << endl;
 		}
-		cout << "CURRENT BEST SCORE: " << bestScore << endl;
-		cout << "----------------------" << endl << endl;
 	}
 	return bestSol;
 }
@@ -102,7 +116,13 @@ Candidate Grasp::RCL(float alpha, Solution &sol, std::list<Candidate> &C){
 
 void Grasp::local(Solution &sol){
 	bool better = true;
-	while(better) better = findNeighbours(sol);	
+	while(better){
+		better = findNeighbours(sol);	
+		if(sol.getScore()==best){
+			cout << "FOUND OPTIMAL. SCORE = " << best << endl;
+			better=false;
+		}
+	}
 }
 
 bool Grasp::findNeighbours(Solution &sol){

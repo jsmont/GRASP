@@ -7,9 +7,11 @@
 
 class Grasp {	
 	SolutionParams params;
+	int best;
 	
 	public:
 		Grasp(SolutionParams params);
+		int getBest();
 		Solution executeGrasp(int maxiter, float alpha);
 
 	private:	
