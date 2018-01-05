@@ -22,10 +22,10 @@ int main(int argc, char* argv[]){
 
 	cout << "INPUT DATA READ" << endl;
 
-	int iterations=5;
+	int iterations=10;
 	float alpha=0.2;
 	int score, bestScore;
-	int patience = 0;
+	int patience = 2;
 	
         Solution sol(solparams);
 	Solution bestSol(solparams);
@@ -52,4 +52,6 @@ int main(int argc, char* argv[]){
 		sol.reset();
 		if(iterations>2) iterations--; //minimum 2 iterations
 	}
+
+    cout << "ABSOLUTE BEST SCORE: " << bestSol.getScore() << endl;
 }

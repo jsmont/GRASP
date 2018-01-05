@@ -17,12 +17,13 @@ Solution Grasp::executeGrasp(int maxiter, float alpha){
         Solution sol(params);	
         cout << "Construction Phase" << endl;
         construct(sol,alpha);
+        cout << "Score: " << (int)sol.getScore()<< endl;
         cout << "Local Search" << endl;
         local(sol);
-        cout << "Score: " << sol.getScore() << endl;
-        if (sol.getScore() < bestScore){
+        cout << "Score: " << (int)sol.getScore()<< endl;
+        if ((int)sol.getScore()< bestScore){
             bestSol=sol;		
-            bestScore=sol.getScore();
+            bestScore=(int)sol.getScore();
         }
         cout << "Current best score: " << bestScore << endl;
     }
@@ -116,12 +117,15 @@ bool Grasp::findNeighbours(Solution &sol){
 
     std::list<Candidate> assigned, unassigned;
     Candidate c;
+    vector<bool> nurse_works = sol.getNurseWorks();
     for(int n=0; n<sol.getNumNurses(); n++){ 
         c.nurse=n;
-        for(int h=0; h<sol.getNumHours(); h++){
-            c.hour=h;
-            if(sol.getWorks(n,h))assigned.push_back(c);
-            else unassigned.push_back(c);
+        if(nurse_works[n]){
+            for(int h=0; h<sol.getNumHours(); h++){
+                c.hour=h;
+                if(sol.getWorks(n,h))assigned.push_back(c);
+                else unassigned.push_back(c);
+            }
         }
     }
 
@@ -149,10 +153,10 @@ void Grasp::perm_assigned(std::list<Candidate> &assigned, std::list<Candidate> &
         std::list<Candidate>::iterator it;
 
         for(int i = 0; i < assigned.size(); ++i){
-            
+
             it = assigned.begin();
             std::advance(it, i);
-            
+
             Candidate c = *it;
             it = assigned.erase(it);
             sol.removeCandidate(c);
@@ -161,8 +165,11 @@ void Grasp::perm_assigned(std::list<Candidate> &assigned, std::list<Candidate> &
 
             it = assigned.begin();
             std::advance(it, i);
-            
+
             it = assigned.insert(it,c);
+            //if(remain == perm){
+            //    cout << "LOCAL " << (100*i)/assigned.size() <<"%" << endl;
+            //}
         }
     }
     else {
@@ -174,15 +181,15 @@ void Grasp::perm_unassigned(std::list<Candidate> &unassigned, Solution &sol, Sol
     if(remain > 0){
         std::list<Candidate>::iterator it;
         for (int i = 0; i < unassigned.size(); ++i){
-            
+
             it = unassigned.begin();
             std::advance(it, i);
-            
+
             Candidate c = *it;
             if(sol.validCandidate(c.nurse, c.hour)>=0){
-                
+
                 it = unassigned.erase(it);
-                
+
                 sol.addAssignment(c);
                 perm_unassigned(unassigned, sol, bestSol, remain-1);
                 sol.removeCandidate(c);

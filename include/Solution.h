@@ -59,6 +59,7 @@ public:
     void copy(Solution &sol);
     vector<int> getNursesWorking();     
     bool getWorks(int n, int h);
+    bool isFeasible(int h, int n);
 
 private:
     
