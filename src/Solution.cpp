@@ -130,6 +130,10 @@ vector<bool> Solution::getNurseWorks(){
     return nurse_works;
 }
 
+bool Solution::getNurseWorks(int n){
+    return nurse_works[n];
+}
+
 bool Solution::validSolution(){
 
     //should also work for partial solutions

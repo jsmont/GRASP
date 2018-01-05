@@ -30,7 +30,6 @@ class Solution {
     vector<bool> nurse_works;
     vector<int> demand;
     vector<int> nurses_working;
-    //int assignments;
     int numHours;
     int score;
     int numNurses;
@@ -51,6 +50,7 @@ public:
     int getNumNurses();
     int getNumHours();
     vector<bool> getNurseWorks();
+    bool getNurseWorks(int n);
     bool validSolution();
     bool validSolution(int n);
     int validCandidate(int n, int h);
