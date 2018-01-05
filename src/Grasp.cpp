@@ -117,14 +117,13 @@ bool Grasp::findNeighbours(Solution &sol){
 
     std::list<Candidate> assigned, unassigned;
     Candidate c;
-    for(int n=0; n<sol.getNumNurses; n++){ 
+    for(int n=0; n<sol.getNumNurses(); n++){ 
         c.nurse=n;
             for(int h=0; h<sol.getNumHours(); h++){
 		c.hour=h;
                 if(sol.getWorks(n,h)) assigned.push_back(c);
                 else unassigned.push_back(c);
-            }
-        }
+            } 
     }
 
     cout << "STARTING PERMUTATIONS";
