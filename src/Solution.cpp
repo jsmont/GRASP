@@ -43,7 +43,7 @@ void Solution::reset(){
 	}
 }
 
-void printWorks(vector<vector<bool>> works){
+void Solution::printSolution(){
 
 
     for(int h = 0; h < works[0].size(); ++h){
@@ -260,16 +260,22 @@ bool Solution::isFeasible(int h, int n){
 
             if(works[n][i] == false && works[n][i-1] == false)
                 partial++;
-            else {
+            else if(partial != 0) {
+                if(works[i-1][n] == false){
+
+                    int consecHours = 1;
+                    for(int j = i; j <= lastHour && works[j][n]; ++j)
+                        consecHours++;
+                    if(consecHours > maxConsec) feasible = false;
+
+                }
                 invalidRests += (partial+1)/2;
                 partial = 0;
             }
-
         }
 
 
         feasible &= (invalidRests <= (maxHours - totalHours));
-        feasible &= (presence / maxConsec <= (presence - totalHours - invalidRests));
 
     }
 

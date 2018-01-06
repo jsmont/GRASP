@@ -44,6 +44,7 @@ public:
     void addAssignment(Candidate c);
     vector<vector<bool> > getAssignments();
     void reset();
+    void printSolution();
     int getScore();
     float getDevStd();
     int getGreedy(int n, int h);

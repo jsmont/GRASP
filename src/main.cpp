@@ -58,7 +58,12 @@ int main(int argc, char* argv[]){
 		if(iterations>2) iterations--; //minimum 2 iterations
 	}*/
 
-    	cout << endl << endl;
+    	
+    cout << endl << endl;
+
+    bestSol.printSolution();
+
 	if(bestSol.getScore()==0) cout << "SOLUTION UNFEASIBLE" << endl;
 	else    cout << "FINAL BEST SCORE: " << bestSol.getScore() << endl;
+
 }
