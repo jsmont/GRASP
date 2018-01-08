@@ -135,9 +135,6 @@ float Solution::getDevStd(){
 
     float std = sq_sum/score;
 
-//    float max_std = (maxHours/2)*(maxHours/2);
-
-//    float normalized_std = std/max_std;
      return std;
 }
 
@@ -167,7 +164,6 @@ bool Solution::getNurseWorks(int n){
 
 bool Solution::validSolution(){
 
-    //should also work for partial solutions
     bool ok=true;
     int n=0;
     //(1) At least each hour h there must be at least demand_h nurses working

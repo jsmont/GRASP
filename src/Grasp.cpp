@@ -116,8 +116,13 @@ Candidate Grasp::RCL(float alpha, Solution &sol, std::list<Candidate> &C){
 
 void Grasp::local(Solution &sol){
 	bool better = true;
-	while(better){
+	int limit = 0;
+	int score;
+	while(better && limit<10){ //set a limit of iterations without getting a better score
+		score=sol.getScore();
 		better = findNeighbours(sol);	
+		if(sol.getScore()==score) limit++;
+		else limit=0;
 		if(sol.getScore()==best){
 			cout << "FOUND OPTIMAL. SCORE = " << best << endl;
 			better=false;
@@ -147,7 +152,7 @@ bool Grasp::findNeighbours(Solution &sol){
 		sol.removeCandidate(c1);
 		for (std::list<Candidate>::iterator it2=unassigned.begin(); it2 != unassigned.end(); ++it2){
 			Candidate c2 = *it2;
-			if(c2.hour==c1.hour){
+			if(c2.hour==c1.hour){ 
 				if(sol.validCandidate(c2.nurse, c2.hour)>=0){
 					sol.addAssignment(c2);
 					if(sol.getScore()<bestSol.getScore() || (sol.getScore()==bestSol.getScore() && sol.getDevStd()>bestSol.getDevStd())){
