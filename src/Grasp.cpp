@@ -26,7 +26,7 @@ Solution Grasp::executeGrasp(int maxiter, float alpha){
 	cout << "STARTING GRASP" << endl;
 	cout << "ITERATIONS: " << maxiter << endl;
 	cout << "ALPHA: " << alpha << endl;
-//	#pragma omp parallel for schedule(dynamic,1)
+	#pragma omp parallel for schedule(dynamic,1)
 	for(int k = 0; k < maxiter; k++){
 		if(bestSol.getScore()!=best){
 			cout << "ITERATION: " << k << endl;
@@ -123,8 +123,8 @@ void Grasp::local(Solution &sol){
 	bool better = true;
 	int limit = 0;
 	int score;
-	int it=0;
-	time_t timer, timer2;
+//	int it=0;
+/*	time_t timer, timer2;
 	
 	ofstream stats;
 	ofstream times;
@@ -141,8 +141,7 @@ void Grasp::local(Solution &sol){
 	times.open(buffer);
 //	times.open("time-%f.csv",(double) timer);
 
-//	time(&timer);
-//	times << "TIME START" << (double) timer << endl;
+*/
 	while(better && limit<20){ //set a limit of iterations without getting a better score
 		score=sol.getScore();
 		time(&timer);
@@ -154,9 +153,9 @@ void Grasp::local(Solution &sol){
 			cout << "FOUND OPTIMAL. SCORE = " << best << endl;
 			better=false;
 		}
-		stats /*<< it << "\t"*/ << sol.getScore() << endl;
-		times /*<< it << "\t"*/ << (double)timer2-timer  << endl;
-		it++;
+//		stats /*<< it << "\t"*/ << sol.getScore() << endl;
+//		times /*<< it << "\t"*/ << (double)timer2-timer  << endl;
+//		it++;
 	}
 }
 
