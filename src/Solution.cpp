@@ -139,7 +139,13 @@ float Solution::getDevStd(){
 }
 
 int Solution::getGreedy(int n, int h){ //obviously will have to tune and stuff
-    return score + !nurse_works[n];
+    int wHours=0;
+    if(nurse_works[n]){
+	for(int i=0; i<numHours; i++){
+		if(works[n][i]) wHours++;
+	}
+    }
+    return numHours + numHours*(!nurse_works[n]) - wHours; //numHours added to be positive
 }
 
 int Solution::getDemand(int h){

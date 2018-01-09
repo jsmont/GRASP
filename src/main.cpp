@@ -22,8 +22,8 @@ int main(int argc, char* argv[]){
 
 	cout << "INPUT DATA READ" << endl;
 
-	int iterations=5;
-	float alpha=0.1;
+	int iterations=1;
+	float alpha=0;
 	int score, bestScore;
 	//int patience = 2;	
         Solution sol(solparams);

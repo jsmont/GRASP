@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <iterator>
 #include <random>
+#include <iostream>
+#include <fstream>
+#include <time.h>
+#include <string>
 
 Grasp::Grasp(SolutionParams params){
 	this->params=params;
@@ -18,10 +22,11 @@ int Grasp::getBest(){
 Solution Grasp::executeGrasp(int maxiter, float alpha){ 
 	Solution bestSol(params);
 	int bestScore = bestSol.getNumNurses();
+	
 	cout << "STARTING GRASP" << endl;
 	cout << "ITERATIONS: " << maxiter << endl;
 	cout << "ALPHA: " << alpha << endl;
-	#pragma omp parallel for schedule(dynamic,1)
+//	#pragma omp parallel for schedule(dynamic,1)
 	for(int k = 0; k < maxiter; k++){
 		if(bestSol.getScore()!=best){
 			cout << "ITERATION: " << k << endl;
@@ -118,15 +123,40 @@ void Grasp::local(Solution &sol){
 	bool better = true;
 	int limit = 0;
 	int score;
-	while(better && limit<10){ //set a limit of iterations without getting a better score
+	int it=0;
+	time_t timer, timer2;
+	
+	ofstream stats;
+	ofstream times;
+	time(&timer);
+	
+	struct tm * now = localtime( & timer );
+
+	char buffer [81];
+	
+	strftime (&buffer[1],80,"%H-%M-%S",now);
+	buffer[0]='s';
+	stats.open(buffer);
+	buffer[0]='t';
+	times.open(buffer);
+//	times.open("time-%f.csv",(double) timer);
+
+//	time(&timer);
+//	times << "TIME START" << (double) timer << endl;
+	while(better && limit<20){ //set a limit of iterations without getting a better score
 		score=sol.getScore();
+		time(&timer);
 		better = findNeighbours(sol);	
+		time(&timer2);
 		if(sol.getScore()==score) limit++;
 		else limit=0;
 		if(sol.getScore()==best){
 			cout << "FOUND OPTIMAL. SCORE = " << best << endl;
 			better=false;
 		}
+		stats /*<< it << "\t"*/ << sol.getScore() << endl;
+		times /*<< it << "\t"*/ << (double)timer2-timer  << endl;
+		it++;
 	}
 }
 
